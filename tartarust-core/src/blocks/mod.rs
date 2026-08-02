@@ -63,6 +63,10 @@ impl Block {
         &mut self.0
     }
 
+    pub fn words(&self) -> &[u32; BLOCK_WORDS] {
+        &self.0
+    }
+
     pub fn from_digest(digest: &[u8]) -> Self {
         let mut block = Self([0u32; 256]);
 
@@ -85,7 +89,6 @@ impl Block {
         let mut column = [0u32; 16];
         for row in 0..16 {
             column[row] = self[index + (row * 16)];
-            println!("row is {row}, index is {index}, self's index is {}", index + (row * 16));
         }
         column
     }
@@ -94,7 +97,6 @@ impl Block {
         assert!(index < 16);
         for row in 0..16 {
             self[index + (row * 16)] = column[row];
-            println!("row is {row}, index is {index}, self's index is {}", index + (row * 16));
         }
     }
 }

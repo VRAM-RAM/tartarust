@@ -55,7 +55,7 @@ impl BitXor for Block {
         loop {
             output_block[index] = self[index] ^ rhs[index];
             index += 1;
-            if index > 256 { break; }
+            if index >= 256 { break; }
         }
         output_block
     }
@@ -67,7 +67,7 @@ impl BitXorAssign for Block {
         loop {
             self[index] ^= rhs[index];
             index += 1;
-            if index > 256 { break; }
+            if index >= 256 { break; }
         }
     }
 }

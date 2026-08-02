@@ -29,12 +29,16 @@ pub fn tartarus(
 
     memory_pool.forward(&mut state, iterations);
 
-    memory_pool.reduct(state);
+    memory_pool.reduct(&mut state);
     state.mix();
 
     digest.zeroize();
 
-    let bytes: &[u8] = bytemuck::cast_slice(&state);
+    let bytes: Vec<u8> = state
+        .words()[..16]
+        .iter()
+        .flat_map(|word| word.to_be_bytes())
+        .collect();
 
     Ok(bytes.to_vec())
 }

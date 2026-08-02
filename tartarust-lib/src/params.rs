@@ -20,6 +20,14 @@ impl TartarusParams {
         }
     }
 
+    pub fn test() -> Self {
+       Self {
+            memory: 12,
+            iterations: 1,
+            pepper: Pepper::generate(),
+       }
+    }
+
     pub fn with_pepper(&mut self, pepper: Pepper) {
         self.pepper = pepper
     }

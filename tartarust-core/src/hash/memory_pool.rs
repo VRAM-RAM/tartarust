@@ -17,8 +17,8 @@ impl MemoryPool {
     }
 
     pub fn init(&mut self, state: &Block) {
-        self.blocks[0] = Block::from_state_with_index(&state, 0);
-        self.blocks[1] = Block::from_state_with_index(&state, 1);
+        self.blocks[0] = Block::from_state_with_index(&state, 1);
+        self.blocks[1] = Block::from_state_with_index(&state, 2);
 
         let mut index = 2;
 
@@ -49,10 +49,10 @@ impl MemoryPool {
         }
     }
 
-    pub fn reduct(&mut self, mut state: Block) {
+    pub fn reduct(&mut self, state: &mut Block) {
         for index in 0..self.count {
             state[index % 16] ^= index as u32;
-            state ^= self.blocks[index];
+            *state ^= self.blocks[index];
 
             if index % 256 == 255 { state.mix(); }
         }
