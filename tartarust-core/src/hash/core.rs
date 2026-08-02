@@ -1,7 +1,6 @@
 use crate::blocks::Block;
 use crate::hash::memory_pool::MemoryPool;
 use crate::{errors::TartarusError, hash::HmacSha256};
-use crate::hash::Hash;
 use zeroize::Zeroize;
 use hmac::{KeyInit, Mac};
 
@@ -11,7 +10,7 @@ pub fn tartarus(
     pepper: &[u8], 
     memory: u32, 
     iterations: u32, 
-) -> Result<Hash, TartarusError> {
+) -> Result<Vec<u8>, TartarusError> {
     let mut mac = HmacSha256::new_from_slice(pepper)?;
     
     let len_prefix = &prepare_len_prefix(salt.len() as u32, data.len() as u32);
@@ -37,7 +36,7 @@ pub fn tartarus(
 
     let bytes: &[u8] = bytemuck::cast_slice(&state);
 
-    Ok(Hash::new(bytes))
+    Ok(bytes.to_vec())
 }
 
 

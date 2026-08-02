@@ -1,3 +1,6 @@
 [workspace]
-members = ["tartarust-core",]
+members = ["tartarust-core", "tartarust-lib"]
+
+[workspace.dependencies]
+tartarust-core = { path = "./tartarust-core" }
 

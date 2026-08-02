@@ -1,5 +1,5 @@
 [package]
-name = "tartarust-core"
+name = "tartarust-lib"
 version = "0.1.0"
 edition = "2024"
 
@@ -11,5 +11,6 @@ num-traits = "0.2.19"
 rand = "0.8.2"
 sha2 = "0.11.0"
 subtle = "2.6.1"
-zeroize = "1.9.0"
-
+zeroize = { version = "1.9.0", features = ["derive"] }
+tartarust-core.workspace = true
+serde = { version = "1.0.229", features = ["derive"] }
