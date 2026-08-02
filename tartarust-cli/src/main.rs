@@ -10,6 +10,7 @@ pub mod verify;
 pub mod cli;
 pub mod parameters;
 
+/// Entry point of the cli tool. We parse the arguments, call the appropriate function, and finally print the output.
 fn main() {
     let cli = Cli::parse();
     let mut output = FrontendOutput::new();
@@ -49,7 +50,7 @@ fn main() {
             output.print();
         }
 
-        None => todo!()
+        None => println!("Run tartarust-cli --help !"),
     }
 
     

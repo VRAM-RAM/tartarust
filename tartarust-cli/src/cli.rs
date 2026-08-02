@@ -21,28 +21,26 @@ pub struct Cli {
 /// - Params : Changes the saved parameters (memory usage, number of iterations).
 #[derive(Subcommand)]
 pub enum Commands {
+    /// Hash a password
     Hash {
         /// Password to hash
         #[arg(short = 'p', long = "password")]
         password: String,
 
-        /// The `salt` the value of the salt will determine which function will be used :
-        /// 
-        /// `salt == None -> hash();`
-        /// 
-        /// `salt == Some(String) == hash_with_custom_salt();`
-        /// 
-        /// So, if you don't provide salt, it will generate one randomly.
+        /// The salt the value of the salt will determine which function will be used :
+        /// If you don't provide a salt, it will generate one randomly.
+        /// If you provide one, the one you provided will be used.
         #[arg(short = 's', long = "salt")]
         salt: Option<String>,
     },
 
+    /// Verify a password against a stored hash
     Verify {
         /// Password to verify
         #[arg(short = 'p', long = "password")]
         password: String,
 
-        /// The `salt` of the stored hash.
+        /// The salt of the stored hash.
         #[arg(short = 's', long = "salt")]
         salt: String,
 
@@ -51,13 +49,13 @@ pub enum Commands {
         hash: String
     },
 
-    
+    /// Show or configure hashing parameters
     Params {
-        /// Changes the memory usage
-        #[arg(short = 'm', long = "memory", value_name = "MEM")]
+        /// Changes the memory usage (Memory cost in MiB)
+        #[arg(short = 'm', long = "memory", value_name = "MiB")]
         memory: Option<u32>,
 
-        /// Changes the number of iterations
+        /// Changes the number of iterations (Number of memory-hard iterations)
         #[arg(long = "iterations", visible_alias = "it", value_name = "ITER")]
         iterations: Option<u32>,
     }

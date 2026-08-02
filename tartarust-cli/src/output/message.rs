@@ -1,6 +1,7 @@
 use colored::Colorize;
 use ecow::EcoString;
 
+/// The message kinds : helpers for displaying outputs that aren't errors.
 pub enum MessageKind {
     Hash {
         hashed: EcoString,

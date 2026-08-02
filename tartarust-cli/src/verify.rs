@@ -6,6 +6,13 @@ use tartarust_lib::generation::{Pepper, Salt};
 use tartarust_lib::hash::Hash;
 use tartarust_lib::params::TartarusParams;
 
+
+/// Helper function, called by `main()`, that modifies the `output` with the result of the verification.
+/// 
+/// First, we try to get the `pepper` from the environment variable. If we fail, we fill the output with an error, and exit the function.
+/// After that, we try to decode the `salt`. If we fail, we fill the output with an error, and exit the function.
+/// Then, we decode the `stored_digest`. If we fail, we fill the output with an error, and exit the function.
+/// Finally, we load the params, and update `output` with the result of the verification.
 #[allow(unused_assignments)]
 pub fn verify_password(password: String, salt_hex: String, hash: String, output: &mut FrontendOutput) {
     let mut pepper = String::new(); // We create an empty string to store the pepper.

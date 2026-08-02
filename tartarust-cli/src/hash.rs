@@ -8,7 +8,11 @@ use crate::output::frontend_ouput::FrontendOutput;
 use crate::output::message::MessageKind;
 use crate::parameters::CliParams;
 
-
+/// Helper function, called by `main()`, that modifies the `output` with the result of the hashing.
+/// 
+/// First, we try to get the `pepper` from the environment variable. If we fail, we fill the output with an error, and exit the function.
+/// Then, we load the parameters, and try hashing the provided `password` with the parameters. If we fail, we fill the output with an error, and exit the function.
+/// If we succeed, we return the result of the `hashing` (salt + password).
 #[allow(unused_assignments)]
 pub fn hash_password(password: String, output: &mut FrontendOutput) {
     let mut pepper = String::new(); // We create an empty string to store the pepper.
@@ -36,6 +40,12 @@ pub fn hash_password(password: String, output: &mut FrontendOutput) {
     }
 }
 
+/// Helper function, called by `main()`, that modifies the `output` with the result of the hashing, but with a provided salt this time.
+/// 
+/// First, we try to get the `pepper` from the environment variable. If we fail, we fill the output with an error, and exit the function.
+/// After that, we try to decode the `salt`. If we fail, we fill the output with an error, and exit the function.
+/// Then, we load the parameters, and try hashing the provided `password` with the parameters. If we fail, we fill the output with an error, and exit the function.
+/// If we succeed, we return the result of the `hashing` (salt + password).
 #[allow(unused_assignments)]
 pub fn hash_password_salt(password: String, salt_hex: String, output: &mut FrontendOutput) {
     let mut pepper = String::new(); // We create an empty string to store the pepper.

@@ -3,7 +3,7 @@ use crate::{output::error::Error, output::message::MessageKind};
 
 /// The frontend output `structure` : manages the message and potential errors returned to the user.
 pub struct FrontendOutput {
-    /// The success (or failure) message : for example, the output of `hash`, or `verify`.
+    /// A message that isn't an error. 
     message: MessageKind,
 
     /// If an error happened, we don't cast it as a message : we cast it as an Error, which contains precise informations :
