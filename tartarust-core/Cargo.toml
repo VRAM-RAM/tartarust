@@ -1,0 +1,14 @@
+[package]
+name = "tartarust-core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bytemuck = "1.25.2"
+hex = "0.4.3"
+hmac = "0.13.0"
+num-traits = "0.2.19"
+sha2 = "0.11.0"
+subtle = "2.6.1"
+zeroize = "1.9.0"
+
