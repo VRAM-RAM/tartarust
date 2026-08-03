@@ -9,7 +9,8 @@ This repository contains :
 + The tartarus algorithm reference implementation (in C)
 + Tartarust, a Rust implementation of Tartarus splitted in three crates.
 
-> [!WARNING] Tartarus is experimental. It isn't audited. For production use, consider using Argon2id.
+> [!WARNING] 
+> Tartarus is experimental. It isn't audited. For production use, consider using Argon2id.
 
 
 ## Why tartarus ?
