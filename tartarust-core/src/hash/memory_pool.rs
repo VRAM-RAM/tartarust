@@ -1,5 +1,3 @@
-use std::{ops::Rem, process::id};
-use zeroize::Zeroize;
 use crate::blocks::Block;
 
 pub struct MemoryPool {

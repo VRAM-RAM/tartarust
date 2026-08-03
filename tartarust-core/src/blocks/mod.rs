@@ -1,7 +1,5 @@
 use std::{ops::{Index, IndexMut, Deref, DerefMut}};
 
-use crate::hash::memory_pool::MemoryPool;
-
 pub mod block_operations;
 
 const BLOCK_WORDS: usize = 256; 

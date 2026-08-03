@@ -31,7 +31,7 @@ pub fn verify_password(password: String, salt_hex: String, hash: String, output:
         Ok(value) => { salt = value; }, // We allocate the salt.
 
         Err(e) => {
-            output.insert_error(e.to_eco_string(),EcoString::from("verify_password function"), EcoString::from("Please enter a valid hex salt : It must be 64 chars long !"));
+            output.insert_error(e.to_eco_string(),EcoString::from("verify_password function"), EcoString::from("Please enter a valid hex salt : It must be 32 chars long !"));
             return; // Because we had an error, we return and exit the function.
         }
     }

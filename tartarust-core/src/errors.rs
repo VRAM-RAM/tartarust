@@ -24,7 +24,7 @@ impl std::fmt::Display for TartarusError {
         let str = match self {
             TartarusError::MacCreationError(e) => format!("Mac creation error : {:?}", e),
             TartarusError::HexDecodingError(e) => format!("Hex decoding error : {:?}", e),
-            TartarusError::SaltLengthIsWrong => "Salt length is wrong. It should be 64 when encoded in hex, and 32 when encoded in bytes".to_string(),
+            TartarusError::SaltLengthIsWrong => "Salt length is wrong. It should be 32 when encoded in hex, and 16 when encoded in bytes".to_string(),
         };
 
         write!(f, "`{str}`")

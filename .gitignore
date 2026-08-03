@@ -2,3 +2,4 @@
 target
 .DS_Store
 tartarus_params.toml
+tartarus_c/tartarus_cli

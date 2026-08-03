@@ -11,3 +11,10 @@ hex = "0.4"
 serde = { version = "1", features = ["derive"] }
 toml = "0.8"
 tartarust-lib.workspace = true
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

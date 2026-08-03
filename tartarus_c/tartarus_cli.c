@@ -48,6 +48,26 @@ static inline void xor_blocks(Block *dst, const Block *src1, const Block *src2) 
     for (int i = 0; i < BLOCK_WORDS; i++) dst->v[i] = src1->v[i] ^ src2->v[i];
 }
 
+static int hex_digit(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+
+/* Decodes a hex string of exactly hex_len characters into `out` (hex_len / 2 bytes).
+   Returns 1 on success, 0 if the input is malformed. */
+static int decode_hex(const char *hex, size_t hex_len, uint8_t *out) {
+    if (hex_len % 2 != 0) return 0;
+    for (size_t i = 0; i < hex_len; i += 2) {
+        int hi = hex_digit(hex[i]);
+        int lo = hex_digit(hex[i + 1]);
+        if (hi < 0 || lo < 0) return 0;
+        out[i / 2] = (uint8_t)((hi << 4) | lo);
+    }
+    return 1;
+}
+
 static inline void init_pool_block(Block *dst, const Block *state, uint32_t index) {
     *dst = *state;
     dst->v[0] ^= index;
@@ -208,7 +228,7 @@ int main(int argc, char *argv[]) {
         char generated_hash[129];
         
         if (tartarus((const uint8_t*)password, strlen(password), 
-                     (const uint8_t*)salt_hex, 32,
+                     salt_bytes, sizeof(salt_bytes),
                      (const uint8_t*)SERVER_PEPPER, strlen(SERVER_PEPPER), 
                      mem_mb, iter, generated_hash) == 0) {
             
@@ -232,12 +252,23 @@ int main(int argc, char *argv[]) {
         const char *salt_input = argv[3];
         const char *hash_input = argv[4];
 
+        if (strlen(salt_input) != 32) {
+            printf("[-] Error: Invalid salt. It must be 32 hexadecimal characters long.\n");
+            return 1;
+        }
+
+        uint8_t salt_bytes[16];
+        if (!decode_hex(salt_input, 32, salt_bytes)) {
+            printf("[-] Error: Invalid salt. It must be 32 hexadecimal characters long.\n");
+            return 1;
+        }
+
         printf("[*] Computing Hash for verification (Parameters: %u MB, %u Iterations)...\n", mem_mb, iter);
         
         char computed_hash[129];
         
         if (tartarus((const uint8_t*)password, strlen(password), 
-                     (const uint8_t*)salt_input, strlen(salt_input), 
+                     salt_bytes, sizeof(salt_bytes), 
                      (const uint8_t*)SERVER_PEPPER, strlen(SERVER_PEPPER), 
                      mem_mb, iter, computed_hash) == 0) {
             

@@ -6,7 +6,7 @@ fn params(memory: u32, iterations: u32) -> TartarusParams {
     TartarusParams::new(memory, iterations, Pepper::from("test_pepper_32_bytes_0123456789abcdef"))
 }
 
-fn salt_from_bytes(bytes: [u8; 32]) -> Salt {
+fn salt_from_bytes(bytes: [u8; 16]) -> Salt {
     Salt::from_bytes(bytes)
 }
 
@@ -52,7 +52,7 @@ fn hash_uses_random_salts() {
 #[test]
 fn custom_salt_is_deterministic() {
     let p = params(4, 1);
-    let fixed_salt = salt_from_bytes([7u8; 32]);
+    let fixed_salt = salt_from_bytes([7u8; 16]);
     let first = hash_with_custom_salt(DATA, fixed_salt.clone(), &p).unwrap();
     let second = hash_with_custom_salt(DATA, fixed_salt, &p).unwrap();
     assert_eq!(first.digest(), second.digest());
@@ -62,8 +62,8 @@ fn custom_salt_is_deterministic() {
 #[test]
 fn different_custom_salts_yield_different_hashes() {
     let p = params(4, 1);
-    let hashed_a = hash_with_custom_salt(DATA, salt_from_bytes([1u8; 32]), &p).unwrap();
-    let hashed_b = hash_with_custom_salt(DATA, salt_from_bytes([2u8; 32]), &p).unwrap();
+    let hashed_a = hash_with_custom_salt(DATA, salt_from_bytes([1u8; 16]), &p).unwrap();
+    let hashed_b = hash_with_custom_salt(DATA, salt_from_bytes([2u8; 16]), &p).unwrap();
     assert_ne!(hashed_a.digest(), hashed_b.digest());
     assert!(hashed_a.verify(DATA, &p).unwrap());
     assert!(hashed_b.verify(DATA, &p).unwrap());
@@ -88,6 +88,6 @@ fn pepper_conversions() {
 }
 
 #[test]
-fn salt_is_32_bytes() {
-    assert_eq!(Salt::generate().as_ref().len(), 32);
+fn salt_is_16_bytes() {
+    assert_eq!(Salt::generate().as_ref().len(), 16);
 }

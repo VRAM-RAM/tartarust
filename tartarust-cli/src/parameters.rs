@@ -14,7 +14,7 @@ pub struct CliParams {
 impl Default for CliParams {
     fn default() -> Self {
         Self {
-            memory: 12,
+            memory: 128,
             iterations: 3,
         }
     }
@@ -68,7 +68,7 @@ mod tests {
     #[test]
     fn defaults_are_hardcoded() {
         let params = CliParams::default();
-        assert_eq!(params, CliParams { memory: 12, iterations: 3 });
+        assert_eq!(params, CliParams { memory: 128, iterations: 3 });
     }
 
     #[test]
@@ -127,7 +127,7 @@ mod tests {
         let base = CliParams::default();
 
         assert_eq!(base.apply(Some(64), None), CliParams { memory: 64, iterations: 3 });
-        assert_eq!(base.apply(None, Some(2)), CliParams { memory: 12, iterations: 2 });
+        assert_eq!(base.apply(None, Some(2)), CliParams { memory: 128, iterations: 2 });
         assert_eq!(base.apply(Some(64), Some(2)), CliParams { memory: 64, iterations: 2 });
         assert_eq!(base.apply(None, None), base);
     }

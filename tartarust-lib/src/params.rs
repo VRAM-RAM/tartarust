@@ -1,6 +1,11 @@
 use crate::generation::Pepper;
 
 
+/// Contains tartarus parameters :
+/// 
+/// - memory (in MiB)
+/// - iterations 
+/// - pepper
 pub struct TartarusParams {
     pub memory: u32,
     pub iterations: u32,
@@ -12,6 +17,8 @@ impl TartarusParams {
         Self { memory, iterations, pepper }
     }
 
+    /// The reocmmended parameters. 
+    /// Warning : the parameters aren't audited.
     pub fn recommended() -> Self {
         Self {
             memory: 64,
@@ -20,6 +27,7 @@ impl TartarusParams {
         }
     }
 
+    /// Parameters for test.
     pub fn test() -> Self {
        Self {
             memory: 12,
@@ -28,6 +36,15 @@ impl TartarusParams {
        }
     }
 
+    /// Inserts a custom pepper in the parameters. For example :
+    /// 
+    /// ```rust
+    /// use tartarust_lib::generation::Pepper;
+    /// use tartarust_lib::params::TartarusParams;
+    /// 
+    /// let mut params = TartarusParams::recommended();
+    /// params.with_pepper(Pepper::from("my pepper"));
+    /// ```
     pub fn with_pepper(&mut self, pepper: Pepper) {
         self.pepper = pepper
     }

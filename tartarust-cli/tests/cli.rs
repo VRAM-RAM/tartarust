@@ -36,7 +36,7 @@ fn params_shows_defaults_without_config() {
     let text = stdout_str(&run_in(&dir, &["params"], false));
 
     assert!(text.contains("Current parameters:"));
-    assert!(text.contains("Memory: 12 MB"));
+    assert!(text.contains("Memory: 128 MB"));
     assert!(text.contains("Iterations: 3"));
 
     std::fs::remove_dir_all(&dir).ok();
@@ -48,7 +48,7 @@ fn params_saves_and_persists() {
 
     let changed = stdout_str(&run_in(&dir, &["params", "-m", "64"], false));
     assert!(changed.contains("Parameters changed:"));
-    assert!(changed.contains("Memory: 12 MB -> 64 MB"));
+    assert!(changed.contains("Memory: 128 MB -> 64 MB"));
     assert!(changed.contains("Iterations: 3 -> 3"));
 
     let config = dir.join("tartarus_params.toml");
@@ -101,7 +101,7 @@ fn verify_rejects_malformed_inputs() {
     let bad_salt = stdout_str(&run_in(&dir, &["verify", "-p", "password123", "-s", "zzz", "-H", "ab"], true));
     assert!(bad_salt.contains("valid hex salt"));
 
-    let valid_salt = "00".repeat(32);
+    let valid_salt = "00".repeat(16);
     let bad_hash = stdout_str(&run_in(&dir, &["verify", "-p", "password123", "-s", &valid_salt, "-H", "zzz"], true));
     assert!(bad_hash.contains("valid hex hash"));
 

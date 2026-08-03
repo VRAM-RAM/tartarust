@@ -1,99 +1,174 @@
-# Tartarus Hasher
+# Tartarus
 
-**An ultra-secure, memory-hard, and GPU-resistant Password Key Derivation Function (KDF) and CLI Tool.**
+> A memory-hard password hashing algorithm and its Rust implementation.
 
-Tartarus is a state-of-the-art cryptographic hashing engine designed to protect user passwords against the most brutal hardware attacks (GPUs, ASICs, and FPGA clusters). Built on the foundational principles of modern KDFs like Argon2id, Tartarus forces attackers into a memory-bound labyrinth, making brute-force and dictionary attacks economically unfeasible.
+Tartarus is an experimental KDF (Key Derivation Function) based on a memory-hard design intended to increase the computational cost of offline password cracking.
 
-## 🛡️ Why Tartarus? (The Merits)
+This repository contains :
 
-Standard hashing algorithms like SHA-256 or SHA-512 are dangerously fast. A modern GPU cluster can guess billions of passwords per second. Tartarus levels the playing field by being **Memory-Hard**. 
++ The tartarus algorithm reference implementation (in C)
++ Tartarust, a Rust implementation of Tartarus splitted in three crates.
 
-Instead of just doing math, Tartarus allocates a massive pool of memory (128 MB by default) and forces the processor to jump unpredictably through it using a cryptographic sponge construction.
+> [!WARNING] Tartarus is experimental. It isn't audited. For production use, consider using Argon2id.
 
-* **ASIC & GPU Resistant:** By requiring large, pseudo-random memory reads and writes, it bottlenecks the fast memory architectures of graphics cards.
-* **Military-Grade Primitives:** Built on the proven **ChaCha20** stream cipher and **HMAC-SHA512**, completely avoiding homemade, untested ARX operations.
-* **TMTO Defeated:** Implements an asymmetrical "Cross-Pass Labyrinth" that strictly prevents Time-Memory Trade-Off (TMTO) attacks. Attackers cannot compute the hash without paying the full memory cost.
-* **Constant-Time Verification:** The built-in `tartarus_verify` function prevents side-channel timing attacks when comparing hashes during user login.
-* **Strict Domain Separation:** Prevents length-extension and collision attacks between passwords, salts, and peppers.
 
-## 🚀 Getting Started
+## Why tartarus ?
 
-### 1. Use the precompiled `.exe` (by myself)
-This is if you don't want to setup all the required stuff to try out Tartarus CLI, just download it from the [releases](https://github.com/KenzoPortela/tartarus-hasher/releases/) page and run !
+General-purpose cryptographic hash functions such as SHA-256 and SHA-512 are intentionally designed to be fast.
+This makes them excellent for integrity checking, digital signatures and HMACs, but unsuitable for storing passwords directly.
+Password hashing algorithms intentionally trade performance for security by increasing the cost of each password guess.
 
-### 2. Compile the program youself
+Tartarus follows this philosophy by combining:
 
-#### Prerequisites
-You need a C compiler (`gcc`) and the OpenSSL development libraries installed on your system.
-* **Linux:** `sudo apt install gcc libssl-dev`
-* **Windows:** Use MSYS2 to install `mingw-w64-ucrt-x86_64-gcc` and `mingw-w64-ucrt-x86_64-openssl`.
++ configurable memory usage
++ multiple memory-hard passes
++ pseudo-random memory accesses
++ diffusion through repeated block mixing
+
+The objective is to increase the cost of large-scale offline attacks while remaining practical for legitimate users.
+
+## Design
+
+Tartarus is inspired by primitives schemes such as *Argon2id* and *ChaCha20*. The current implementation contains :
+
+- HMAC-SHA512 for initial state derivation
+- ChaCha-inspired ARX block mixing
+- Configurable memory cost
+- Configurable iteration count
+- Constant-time verification
+- Random salt / pepper generation
+
+
+## Project structure
+
+```
+.
+├── tartarus-c       # Original C implementation & original Cli
+├── tartarust-core   # Core primitives in Rust
+├── tartarust-lib    # Public Rust API 
+└── tartarust-cli    # Command line interface (in Rust)
+```
+
+
+## Installation
+
+### Build the C CLI from source
+
+Prerequisites
+
+You need a C compiler (gcc) and the OpenSSL development libraries installed on your system.
+
++ Linux : `sudo apt install gcc libssl-dev`
+
++ MacOS : On MacOs, you'll have to run `brew install gcc openssl`.
+
++ Windows: Use MSYS2 to install `mingw-w64-ucrt-x86_64-gcc` and `mingw-w64-ucrt-x86_64-openssl`.
 
 #### Compilation
-Clone the repository and compile the `tartarus_cli.c` file:
+
+Clone the repository and compile the `tartarus_c/tartarus_cli.c` file:
 
 ```bash
 gcc tartarus_cli.c -o tartarus_cli -O3 -lcrypto -Wno-deprecated-declarations
 ```
-*(Note: `-Wno-deprecated-declarations` is used to silence OpenSSL 3.0 transition warnings regarding HMAC structures, ensuring a clean compilation).*
 
-## 💻 Using Tartarus CLI
-
-The `tartarus_cli` tool requires a **Pepper** (a global server-side secret) to operate. This ensures that even if your database is stolen, the hashes cannot be cracked without the server's environment variable.
-
-### 1. Set your Pepper
-Set the environment variable in your terminal before running the CLI:
-
-**On Linux / macOS:**
+Be aware ! On MacOs, the command is not the same :
 ```bash
-export TARTARUS_PEPPER="Your_Ultra_Secure_Server_Secret_Key_Here"
+gcc tartarus_cli.c \
+    -o tartarus_cli \
+    -O3 \
+    -I$(brew --prefix openssl)/include \
+    -L$(brew --prefix openssl)/lib \
+    -lcrypto \
+    -Wno-deprecated-declarations
 ```
-**On Windows (PowerShell):**
+
+(Note: `-Wno-deprecated-declarations` is used to silence OpenSSL 3.0 transition warnings regarding HMAC structures, ensuring a clean compilation).
+
+
+### Build the Rust CLI from source 
+
+```bash
+git clone https://github.com/KenzoPortela/tartarus-hasher
+cd tartarus-hasher && cd tartarust-cli
+cargo build --release
+cargo install --path .
+```
+
+
+# CLI
+
+## Rust CLI :
+
+Generate a password hash:
+
+```bash
+tartarust-cli hash --password "correct horse battery staple"
+```
+
+Verify a password:
+
+```bash
+tartarust-cli verify -p "correct horse battery staple" -s <salt> -H <hash>
+```
+
+The CLI expects the pepper to be provided through the `TARTARUS_PEPPER` environment variable.
+
+Linux/macOS
+
+```bash
+export TARTARUS_PEPPER="your-secret-pepper"
+```
+
+Windows (PowerShell)
+
 ```powershell
-$env:TARTARUS_PEPPER="Your_Ultra_Secure_Server_Secret_Key_Here"
+$env:TARTARUS_PEPPER="your-secret-pepper"
 ```
 
-(On Windows you can also create this environment variable permanently by adding it to the user's section in the system's environment variables)
+For more informations about the Rust Cli, please refeer to the [readme](./tartarust-cli/README.md).
 
-### 2. Hash a New Password (Registration)
-To create a new user, simply pass the password to the `hash` command. Tartarus will automatically securely generate a 16-byte random salt.
+## C CLI :
+
+Hash a password :
 
 ```bash
 ./tartarus_cli hash "MySuperSecretPassword123!"
 ```
-**Output:**
-```text
-[*] Hashing a new password...
 
-[+] SUCCESS! NEW PASSWORD SUCCESSFULLY HASHED.
---------------------------------------------------------------------------------
-Salt : 7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d
-Hash : 629c26355d302c38a7023b685855e062708ada1d8290e621a... (128 chars)
---------------------------------------------------------------------------------
-```
-*You would then store the `Salt` and the `Hash` in your database.*
-
-### 3. Verify a Password (Login)
-To check if a user's password is correct, use the `verify` command followed by the password attempt, the saved salt, and the saved hash.
+Verify a password :
 
 ```bash
 ./tartarus_cli verify "MySuperSecretPassword123!" "7a8b9c0d..." "629c2635..."
 ```
-**Output:**
-```text
-[*] Computing Hash for verification (Parameters: 128 MB, 3 Iterations)...
 
-[+] ACCESS GRANTED: The password is valid! [MATCH]
+## Rust Library
+
+`tartarust-lib` provides functions for using **Tartarus** in your Rust code. For example :
+
+```rust
+use tartarust_lib::hash::{hash, hash_with_custom_salt};
+use tartarust_lib::params::TartarusParams;
+
+let params = TartarusParams::recommended();
+
+let hash = hash(
+    b"correct horse battery staple",
+    params,
+)?;
 ```
 
-## 🗺️ Roadmap
+Verification:
 
-Tartarus is currently in version `v1.0.0`. Here is the roadmap for upcoming features and final 100% industrial certification:
+```rust
+assert!(hash.verify(
+    b"correct horse battery staple",
+    params,
+)?);
+```
 
-- [ ] **Custom Salt Input for Hashing:** Update the CLI to allow hashing with a manually provided salt (e.g., `tartarus_cli hash <password> --salt <custom_salt>`). This is highly useful for specific backend server flows or database migrations.
-- [ ] **Multi-threading (Lanes):** Implement `pthread` support to allow Tartarus to utilize multiple CPU cores simultaneously (similar to Argon2 lanes), improving execution speed for legitimate users while maintaining GPU resistance.
-- [ ] **Formal Statistical Validation:** Generate a 1GB raw output stream to be run through the `dieharder` military statistical test suite to formally prove the avalanche effect and the absence of diffusion bias.
-- [ ] **Shared Library Export (`.so` / `.dll`):** Separate the CLI from the core engine to allow easy bindings for Python, Node.js, Rust, and Go backends.
-- [ ] **Formal Whitepaper Specification:** Publish the mathematical pseudo-code for independent cryptographic peer review.
+For more informations, please refeer to the [readme](./tartarust-lib/README.md).
 
-## ⚠️ Disclaimer
-*Tartarus is an advanced cryptographic research project. While it implements industry-standard primitives (ChaCha20, HMAC-SHA512) and best practices, it has not yet undergone a multi-year formal public audit. Do not use in critical production environments.*
+## License
+
+**Tartarus** is licensed under [MIT](./LICENSE).

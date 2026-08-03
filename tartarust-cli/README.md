@@ -74,7 +74,7 @@ Options:
 Usage: tartarust-cli params [OPTIONS]
 
 Options:
-  -m, --memory <MEM>       Changes the memory usage
+  -m, --memory <MiB>       Changes the memory usage (in MiB)
       --iterations <ITER>  Changes the number of iterations [alias: --it]
   -h, --help               Print help
 
